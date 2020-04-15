@@ -29,7 +29,6 @@ import java.util.regex.Pattern;
 
 public class RemoteInjectionPlugin extends CordovaPlugin {
     private static String TAG = "RemoteInjectionPlugin";
-    private static String SCRIPT_ID = "cordova-plugin-remote-injection-script";
     private static Pattern REMOTE_URL_REGEX = Pattern.compile("^http(s)?://.*");
 
 
@@ -118,13 +117,15 @@ public class RemoteInjectionPlugin extends CordovaPlugin {
 
     private void injectCordova() {
         LOG.d(TAG, "Checking for cordova...");
-        webView.getEngine().evaluateJavascript("document.getElementById('" + SCRIPT_ID + "')", new ValueCallback<String>() {
+        webView.getEngine().evaluateJavascript("window.cordova", new ValueCallback<String>() {
             @Override
             public void onReceiveValue(String result) {
                 if (!"null".equals(result)) {
                     LOG.w(TAG, "Cordova has already been injected");
                     return; // do nothing, as script tag has already been added to the DOM
                 }
+
+                LOG.d(TAG, "Injecting cordova...");
 
                 List<String> jsPaths = new ArrayList<String>();
                 for (String path: preInjectionFileNames) {
